@@ -1037,7 +1037,8 @@ body {
   if (guest && guest.trim()) {
     const name = decodeURIComponent(guest.trim());
     document.getElementById('guest-display').textContent = name;
-    document.getElementById('rsvp-guest-name').textContent = name;
+    const rsvpName = document.getElementById('rsvp-guest-name');
+    if (rsvpName) rsvpName.textContent = name;
   }
 })();
 
@@ -1046,7 +1047,6 @@ function openInvitation() {
   const overlay = document.getElementById('invite-overlay');
   overlay.classList.add('hidden');
   setTimeout(() => { overlay.style.display = 'none'; }, 500);
-  // Trigger music on open
   setTimeout(() => { tryAutoPlay(); }, 600);
 }
 
@@ -1090,12 +1090,10 @@ let isPlaying = false;
 let ytReady   = false;
 let autoPlayPending = false;
 
-// Inject YT API
 const ytScript = document.createElement('script');
 ytScript.src = 'https://www.youtube.com/iframe_api';
 document.head.appendChild(ytScript);
 
-// Hidden player container
 const ytDiv = document.createElement('div');
 ytDiv.id = 'yt-hidden-player';
 ytDiv.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;bottom:0;left:0;z-index:-99;';
@@ -1120,8 +1118,8 @@ window.onYouTubeIframeAPIReady = function() {
 };
 
 function tryAutoPlay() {
-  if (ytReady && ytPlayer) { ytPlayer.playVideo(); }
-  else { autoPlayPending = true; }
+  if (ytReady && ytPlayer) ytPlayer.playVideo();
+  else autoPlayPending = true;
 }
 
 function setMusicState(playing) {
@@ -1141,7 +1139,6 @@ function setMusicState(playing) {
   }
 }
 
-// Floating musical notes
 const NOTE_CHARS = ['♪','♫','♩','♬'];
 let noteInterval = null;
 function spawnNotes() {
@@ -1161,7 +1158,6 @@ function spawnNotes() {
   }, 700);
 }
 
-// Disc click toggle
 document.getElementById('music-disc').addEventListener('click', function(e) {
   e.stopPropagation();
   if (!ytPlayer || !ytReady) { autoPlayPending = true; return; }
@@ -1171,70 +1167,13 @@ document.getElementById('music-disc').addEventListener('click', function(e) {
 
 // ─── RSVP ───
 function sendRSVP() {
-function sendRSVP() {
-    // This grabs the name displayed in the Hero section
-    const nameElement = document.getElementById('guest-display');
-    const name = nameElement ? nameElement.innerText : "Guest";
-    
-    // YOUR SETTINGS
-    const telegramUsername = "@muyyi_srors"; // Put your Telegram username here (without @)
-    const message = `Hello! I am ${name}. I have received the invitation and I am happy to confirm my attendance! 🥂`;
-    
-    // This creates the link and opens it
-    const telegramUrl = `https://t.me/${telegramUsername}?text=${encodeURIComponent(message)}`;
-    window.open(telegramUrl, '_blank');
+  const nameElement = document.getElementById('guest-display');
+  const name = nameElement ? nameElement.innerText : 'Guest';
+  const telegramUsername = 'muyyi_srors';
+  const message = `Hello! I am ${name}. I have received the invitation and I am happy to confirm my attendance! 🥂`;
+  const telegramUrl = `https://t.me/${telegramUsername}?text=${encodeURIComponent(message)}`;
+  window.open(telegramUrl, '_blank');
 }
-
-// This part handles the Guest Name from the URL (already in your logic)
-window.onload = function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const guestName = urlParams.get('guest');
-    if (guestName) {
-        document.getElementById('guest-display').innerText = guestName;
-        // Also update the RSVP name if you have that ID
-        const rsvpName = document.getElementById('rsvp-guest-name');
-        if (rsvpName) rsvpName.innerText = guestName;
-    }
-};
-
-function handleRSVP() {
-  const btn     = document.getElementById('rsvp-btn');
-  const success = document.getElementById('rsvp-success');
-  const params  = new URLSearchParams(window.location.search);
-  const guest   = params.get('guest') || 'Honoured Guest';
-  btn.textContent = '⏳  Submitting...';
-  btn.disabled = true;
-  btn.style.opacity = '0.6';
-  setTimeout(() => {
-    btn.style.display = 'none';
-    success.style.display = 'block';
-    console.log('RSVP confirmed for:', decodeURIComponent(guest), 'at', new Date().toISOString());
-  }, 1200);
-}
-
-function loadGuestName() {
-    // 1. Look at the URL for "?guest=..."
-    const urlParams = new URLSearchParams(window.location.search);
-    const guestName = urlParams.get('guest');
-
-    // 2. If a name exists, put it in the Hero and RSVP sections
-    if (guestName) {
-        // Update the Hero name
-        const heroDisplay = document.getElementById('guest-display');
-        if (heroDisplay) heroDisplay.innerText = guestName;
-
-        // Update the RSVP name (I added a placeholder for you below)
-        const rsvpDisplay = document.getElementById('rsvp-guest-name');
-        if (rsvpDisplay) rsvpDisplay.innerText = guestName;
-    }
-}
-}
-
-// Run this as soon as the page loads
-window.onload = loadGuestName;
-
-
-
 </script>
 
 </body>
