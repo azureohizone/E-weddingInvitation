@@ -965,9 +965,9 @@ body {
     <h2 class="rsvp-main-title">Join Our Celebration</h2>
   </div>
   <p class="rsvp-guest-confirm reveal" id="rsvp-confirm-text">
-    Confirming attendance for <span id="rsvp-guest-name">our honoured guest</span>
+    Are you attending, <span id="rsvp-guest-name">our honoured guest?</span>
   </p>
-  <button class="btn-rsvp reveal" id="rsvp-btn" onclick="handleRSVP()">✓ &nbsp; Accept RSVP</button>
+  <button class="btn-rsvp reveal" id="rsvp-btn" onclick="handleRSVP()">✓ &nbsp; Confirm Attendance</button>
   <p class="rsvp-success" id="rsvp-success">With Joy, We Await You </p>
 
   <div class="social-section reveal">
@@ -1168,6 +1168,15 @@ document.getElementById('music-disc').addEventListener('click', function(e) {
 });
 
 // ─── RSVP ───
+function sendRSVP() {
+    const name = document.getElementById('guest-display').innerText;
+    const telegramUsername = "@muyyi_srors"; // Put your Telegram username here
+    const text = `Hello! I am ${name}. I have received the invitation and I am happy to confirm my attendance! 🥂`;
+    
+    // This opens WhatsApp with the message already typed out for the guest
+    window.open(`https://t.me/${telegramUsername}?text=${encodeURIComponent(text)}`, '_blank');
+}
+
 function handleRSVP() {
   const btn     = document.getElementById('rsvp-btn');
   const success = document.getElementById('rsvp-success');
@@ -1182,6 +1191,29 @@ function handleRSVP() {
     console.log('RSVP confirmed for:', decodeURIComponent(guest), 'at', new Date().toISOString());
   }, 1200);
 }
+
+function loadGuestName() {
+    // 1. Look at the URL for "?guest=..."
+    const urlParams = new URLSearchParams(window.location.search);
+    const guestName = urlParams.get('guest');
+
+    // 2. If a name exists, put it in the Hero and RSVP sections
+    if (guestName) {
+        // Update the Hero name
+        const heroDisplay = document.getElementById('guest-display');
+        if (heroDisplay) heroDisplay.innerText = guestName;
+
+        // Update the RSVP name (I added a placeholder for you below)
+        const rsvpDisplay = document.getElementById('rsvp-guest-name');
+        if (rsvpDisplay) rsvpDisplay.innerText = guestName;
+    }
+}
+
+// Run this as soon as the page loads
+window.onload = loadGuestName;
+
+
+
 </script>
 
 </body>
