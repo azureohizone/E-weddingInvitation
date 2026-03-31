@@ -969,7 +969,13 @@ body {
   </p>
   <!-- att btt is here -->
   <!-- <button class="btn-rsvp reveal" id="rsvp-btn" onclick="handleRSVP()">✓ &nbsp; Confirm Attendance</button> -->
-  <button class="btn-rsvp" onclick="sendRSVP()">Confirm Attendance ✓</button>
+ <a href="https://forms.gle/dbxuSo6TyYxoDAE37" 
+   target="_blank" 
+   rel="noopener noreferrer" 
+   class="btn-rsvp" 
+   style="text-decoration:none; display:inline-block;">
+  Confirm Attendance ✓
+</a>
   <p class="rsvp-success" id="rsvp-success">With Joy, We Await You </p>
 
   <div class="social-section reveal">
@@ -1005,7 +1011,7 @@ body {
       <span style="font-family:'Great Vibes',cursive;font-size:0.7rem;color:rgba(201,168,76,0.5);">I Love You</span>
       <span style="font-size:0.9rem;opacity:0.4;">💛</span>
     </div>
-    <p style="font-family:'Great Vibes',cursive;font-size:1.4rem;color:rgba(201,168,76,0.5);">Satha &amp; Sreypech</p>
+    <p style="font-family:'Great Vibes',cursive;font-size:1.4rem;color:rgba(201,168,76,0.5);">Rasmey &amp; Sreypech</p>
   </div>
 
   <p class="footer-copy">Thursday · 14th May 2026 · Battambang, Cambodia</p>
@@ -1165,15 +1171,8 @@ document.getElementById('music-disc').addEventListener('click', function(e) {
   else ytPlayer.playVideo();
 });
 
-// ─── RSVP ───
-function sendRSVP() {
-  const nameElement = document.getElementById('guest-display');
-  const name = nameElement ? nameElement.innerText : 'Guest';
-  const telegramUsername = 'muyyi_srors';
-  const message = `Hello! I am ${name}. I have received the invitation and I am happy to confirm my attendance! 🥂`;
-  const telegramUrl = `https://t.me/${telegramUsername}?text=${encodeURIComponent(message)}`;
-  window.open(telegramUrl, '_blank');
-}
+
+
 </script>
 
 </body>
