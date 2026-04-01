@@ -6,6 +6,7 @@
 <title>Wedding Invitation – SATHA RASMEY & SRORS SREYPECH</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="preload" as="image" href="./Image/5.JPG">
 <!-- Moul = formal Khmer (couple names, family section) | Koh Santepheap = regular Khmer | Cormorant Garamond + Great Vibes = English -->
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,600&family=Great+Vibes&family=Koh+Santepheap:wght@300;400;700&family=Moul&family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet"/>
 
@@ -148,14 +149,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Add a fallback color that matches the photo's mood (e.g., dark burgundy) */
+  background-color: #2a0510; 
   background: url('./Image/5.JPG') center/cover no-repeat;
-  /* background: linear-gradient(160deg, rgba(140,27,36,0.82) 0%, rgba(44,26,10,0.78) 100%); */
-  /* If you have a couple photo, swap the background above for:
-     background: linear-gradient(rgba(140,27,36,0.65),rgba(44,26,10,0.72)), url('./Image/cover.jpg') center/cover no-repeat; */
   backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
-  animation: fadeIn 0.4s ease both;
-  overflow: hidden;
+  /* ... rest of your code ... */
 }
 
 /* Decorative petal pattern behind overlay */
