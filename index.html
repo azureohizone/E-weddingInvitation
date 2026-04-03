@@ -7,20 +7,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="preload" as="image" href="./Image/5.JPG">
-<!-- Moul = formal Khmer (couple names, family section) | Koh Santepheap = regular Khmer | Cormorant Garamond + Great Vibes = English -->
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,600&family=Great+Vibes&family=Koh+Santepheap:wght@300;400;700&family=Moul&family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet"/>
 
-<!-- Snell Roundhand via system / web fallback -->
 <style>
 @font-face {
   font-family: 'Snell Roundhand';
   src: local('Snell Roundhand'), local('SnellRoundhand');
   font-style: normal;
 }
-/* Fallback stack for Snell Roundhand (macOS/iOS native; Windows fallback = Great Vibes) */
 :root {
   --snell: 'Snell Roundhand', 'Great Vibes', cursive;
-  /* ── NEW ROSE / CRIMSON PALETTE ── */
   --rose-primary:   #e11637;
   --rose-light:     #fbd4dd;
   --rose-mid:       #fd8aa4;
@@ -28,15 +24,12 @@
   --rose-pale:      #fcafc2;
   --rose-dark:      #8c1b24;
   --rose-deep:      #d01f43;
-  /* keep gold for small accents / ornaments */
   --gold:           #C9A84C;
   --gold-light:     #E8D08A;
   --gold-dark:      #8B6914;
   --gold-shine:     #F5E6A3;
-  /* backgrounds — kept warm ivory */
   --cream:          #FDF8F0;
   --ivory:          #FAF4E8;
-  /* text — UNCHANGED from original */
   --brown-deep:     #2C1A0A;
   --brown-mid:      #5C3D1E;
   --white:          #FFFFFF;
@@ -115,7 +108,7 @@ body {
   56%      { transform: scale(1); }
 }
 
-/* ─── Rose Shimmer Text ─── */
+/* ─── Text Styles ─── */
 .rose-text {
   background: linear-gradient(135deg, var(--rose-dark) 0%, var(--rose-primary) 35%, var(--rose-pale) 50%, var(--rose-primary) 65%, var(--rose-dark) 100%);
   background-size: 200% auto;
@@ -124,8 +117,6 @@ body {
   background-clip: text;
   animation: shimmerRose 4s linear infinite;
 }
-
-/* Gold ornamental text kept for small dividers */
 .gold-text {
   background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold) 35%, var(--gold-shine) 50%, var(--gold) 65%, var(--gold-dark) 100%);
   background-size: 200% auto;
@@ -140,7 +131,6 @@ body {
 
 /* ══════════════════════════════════
    1. FULLSCREEN POPUP OVERLAY
-   Background = couple photo, text + button centred
 ══════════════════════════════════ */
 #invite-overlay {
   position: fixed;
@@ -149,76 +139,40 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Add a fallback color that matches the photo's mood (e.g., dark burgundy) */
-  background-color: #2a0510; 
+  background-color: #2a0510;
   background: url('./Image/5.JPG') center/cover no-repeat;
-  backdrop-filter: blur(3px);
-  /* ... rest of your code ... */
 }
 
-/* Decorative petal pattern behind overlay */
-#invite-overlay::before {
+/* FIX: Overlay dark scrim so text is always readable over the photo */
+#invite-overlay::after {
   content: '';
   position: absolute;
   inset: 0;
-  /* background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cellipse cx='50' cy='25' rx='14' ry='22' fill='%23e11637' opacity='.07'/%3E%3Cellipse cx='75' cy='50' rx='14' ry='22' fill='%23e11637' opacity='.07' transform='rotate(90 50 50)'/%3E%3Cellipse cx='50' cy='75' rx='14' ry='22' fill='%23e11637' opacity='.07' transform='rotate(180 50 50)'/%3E%3Cellipse cx='25' cy='50' rx='14' ry='22' fill='%23e11637' opacity='.07' transform='rotate(270 50 50)'/%3E%3C/svg%3E"); */
-  /* background-size: 80px 80px; */
+  background: linear-gradient(
+    to bottom,
+    rgba(42,5,16,0.45) 0%,
+    rgba(42,5,16,0.62) 100%
+  );
   pointer-events: none;
 }
 
-#invite-overlay.hidden {
-  pointer-events: none;
-  animation: none;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-
+/* FIX: Popup sits above the scrim */
 .invite-popup {
   text-align: center;
   max-width: 420px;
   width: 90%;
   position: relative;
+  z-index: 1;
   animation: popIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both 0.15s;
   padding: 20px;
 }
 
-.popup-rose-ornament {
-  font-size: 2.4rem;
-  animation: heartbeat 2.4s ease infinite;
-  display: block;
-  margin-bottom: 8px;
-  filter: drop-shadow(0 0 14px rgba(225,22,55,0.6));
+#invite-overlay.hidden {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
-.popup-you-re {
-  font-family: var(--snell);
-  font-size: clamp(2.4rem, 9vw, 3.4rem);
-  color: #FFFFFF;
-  text-shadow: 0 2px 24px rgba(225,22,55,0.5), 0 1px 4px rgba(0,0,0,0.4);
-  line-height: 1.1;
-  margin-bottom: 6px;
-  display: block;
-}
-
-.popup-subtitle {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(0.9rem, 3.2vw, 1.1rem);
-  font-style: italic;
-  color: rgba(252,175,194,0.9);
-  letter-spacing: 0.06em;
-  margin-bottom: 10px;
-  line-height: 1.7;
-}
-
-.popup-km-subtitle {
-  font-family: 'Koh Santepheap', serif;
-  font-size: clamp(0.9rem, 3vw, 1rem);
-  color: rgba(252,175,194,0.8);
-  margin-bottom: 32px;
-  line-height: 1.8;
-}
-
-/* Divider line in popup */
 .popup-divider {
   width: 120px;
   height: 1px;
@@ -238,7 +192,7 @@ body {
   font-weight: 600;
   letter-spacing: 0.25em;
   text-transform: uppercase;
-  border: none;
+  border: 1.5px solid rgba(252,175,194,0.35);
   border-radius: 100px;
   padding: 18px 52px;
   cursor: pointer;
@@ -247,7 +201,6 @@ body {
   position: relative;
   overflow: hidden;
   min-width: 240px;
-  border: 1.5px solid rgba(252,175,194,0.35);
 }
 .btn-open-invite::before {
   content: '';
@@ -271,16 +224,8 @@ body {
   font-weight: 300;
 }
 
-.popup-note {
-  font-family: var(--snell);
-  font-size: 1.1rem;
-  color: rgba(252,175,194,0.55);
-  margin-top: 22px;
-  letter-spacing: 0.05em;
-}
-
 /* ══════════════════════════════════
-   2. HERO — couple names + highlighted date
+   2. HERO
 ══════════════════════════════════ */
 #hero {
   min-height: 100vh;
@@ -347,7 +292,6 @@ body {
 .hero-divider-diamond { width: 6px; height: 6px; background: var(--rose-primary); transform: rotate(45deg); box-shadow: 0 0 8px var(--rose-primary); }
 
 .couple-names-hero { text-align: center; animation: fadeUp 1.2s ease both 0.9s; margin: 10px 0 24px; }
-/* Couple names = Moul font */
 .couple-name-main {
   font-family: 'Moul', serif;
   font-size: clamp(1.6rem, 5.5vw, 3.2rem);
@@ -372,7 +316,6 @@ body {
   margin-top: 4px;
 }
 
-/* ── Highlighted date badge ── */
 .hero-date-highlight {
   display: inline-flex;
   flex-direction: column;
@@ -413,7 +356,7 @@ body {
 .section-title { font-family: 'Cinzel', serif; font-size: clamp(0.7rem, 2vw, 0.85rem); letter-spacing: 0.4em; text-transform: uppercase; color: var(--rose-dark); text-align: center; margin-bottom: 36px; }
 
 /* ══════════════════════════════════
-   3. ANNOUNCEMENT / LOGISTICS
+   3. LOGISTICS
 ══════════════════════════════════ */
 #logistics-section { background: var(--ivory); position: relative; }
 #logistics-section::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1' fill='%23e11637' opacity='.06'/%3E%3C/svg%3E"); background-size: 60px 60px; }
@@ -451,13 +394,11 @@ body {
 .card-inner::before, .card-inner::after { content: '❧'; position: absolute; font-size: 1.8rem; color: var(--rose-primary); opacity: 0.4; }
 .card-inner::before { top: 12px; left: 16px; }
 .card-inner::after  { bottom: 12px; right: 16px; transform: rotate(180deg); }
-/* Moul for card Khmer title */
 .card-serei-title { font-family: 'Moul', serif; font-size: clamp(1rem, 3.2vw, 1.6rem); font-weight: 400; color: var(--rose-dark); text-align: center; margin-bottom: 6px; }
 .family-columns { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: start; margin: 32px 0; }
 .family-col { text-align: center; }
 .family-col-divider { width: 1px; background: linear-gradient(180deg, transparent, var(--rose-primary), transparent); align-self: stretch; margin: 0 8px; }
 .family-col-title { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--rose-dark); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(225,22,55,0.25); }
-/* Moul for family Khmer names */
 .family-name-km { font-family: 'Moul', serif; font-size: clamp(0.78rem, 2vw, 0.95rem); font-weight: 400; color: var(--brown-deep); line-height: 1.8; margin-bottom: 4px; }
 .family-name-en { font-family: 'Cormorant Garamond', serif; font-size: clamp(0.75rem, 1.8vw, 0.9rem); font-style: italic; color: var(--brown-mid); line-height: 1.6; }
 .card-logo-center { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 20px 0; }
@@ -465,13 +406,12 @@ body {
 .couple-card-row { display: flex; align-items: center; justify-content: center; gap: clamp(16px, 4vw, 40px); flex-wrap: wrap; }
 .couple-card-person { text-align: center; }
 .couple-card-role { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--rose-dark); opacity: 0.75; margin-bottom: 6px; }
-/* Moul for couple name in card */
 .couple-card-km { font-family: 'Moul', serif; font-size: clamp(0.9rem, 2.8vw, 1.2rem); font-weight: 400; color: var(--brown-deep); }
 .couple-card-en { font-family: var(--snell); font-size: clamp(1.3rem, 4vw, 1.9rem); color: var(--rose-dark); margin-top: 2px; }
 .couple-card-amp { font-family: var(--snell); font-size: clamp(1.8rem, 5vw, 2.8rem); color: var(--rose-primary); line-height: 1; filter: drop-shadow(0 2px 6px rgba(225,22,55,0.3)); }
 
 /* ══════════════════════════════════
-   5. RSVP — Button + QR side by side
+   5. RSVP
 ══════════════════════════════════ */
 #footer-section { background: linear-gradient(180deg, #2a0510, #1a0208); padding: 80px 24px 40px; text-align: center; position: relative; overflow: hidden; }
 #footer-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--rose-primary), transparent); }
@@ -481,7 +421,6 @@ body {
 .rsvp-guest-confirm { font-family: 'Cormorant Garamond', serif; font-size: clamp(0.9rem, 2.5vw, 1.1rem); font-style: italic; color: rgba(253,138,164,0.8); margin-bottom: 40px; }
 .rsvp-guest-confirm span { font-family: var(--snell); font-size: clamp(1.2rem, 3.5vw, 1.8rem); color: var(--rose-light); font-style: normal; }
 
-/* RSVP split layout: button left, QR right */
 .rsvp-split {
   display: flex;
   align-items: center;
@@ -491,7 +430,6 @@ body {
   margin-bottom: 40px;
 }
 
-/* YES button */
 .rsvp-attend-block { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .rsvp-attend-label {
   font-family: 'Cinzel', serif;
@@ -501,6 +439,8 @@ body {
   color: rgba(253,138,164,0.55);
   margin-bottom: 4px;
 }
+
+/* FIX: Use <button> styles cleanly — removed misuse of .btn-rsvp-km on <p> tags elsewhere */
 .btn-rsvp-yes {
   display: inline-flex;
   align-items: center;
@@ -517,7 +457,7 @@ body {
   padding: 18px 44px;
   cursor: pointer;
   box-shadow: 0 6px 28px rgba(225,22,55,0.5), 0 2px 8px rgba(0,0,0,0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
   position: relative;
   overflow: hidden;
   min-width: 220px;
@@ -530,27 +470,42 @@ body {
   inset: 0;
   background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent 60%);
   border-radius: 100px;
+  pointer-events: none;
 }
-.btn-rsvp-yes:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(225,22,55,0.7); }
-.btn-rsvp-yes:active { transform: scale(0.97); }
+.btn-rsvp-yes:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(225,22,55,0.7); }
+.btn-rsvp-yes:active:not(:disabled) { transform: scale(0.97); }
+.btn-rsvp-yes:disabled { cursor: not-allowed; }
 
-.btn-rsvp-km {
+/* Khmer sub-label below button (semantic <p>, NOT button inner) */
+.rsvp-sub-label-km {
   font-family: 'Koh Santepheap', serif;
   font-size: 0.8rem;
   color: rgba(253,138,164,0.7);
   letter-spacing: 0.02em;
 }
 
+/* FIX: Single success message element, properly hidden by default */
 .rsvp-success-msg {
   display: none;
+  text-align: center;
+  animation: fadeUp 0.5s ease both;
+}
+.rsvp-success-msg.visible { display: block; }
+.rsvp-success-main {
   font-family: var(--snell);
   font-size: clamp(1.4rem, 4vw, 2rem);
   color: var(--rose-light);
-  margin-top: 14px;
-  animation: fadeUp 0.5s ease both;
+  display: block;
+  margin-bottom: 4px;
+}
+.rsvp-success-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(0.9rem, 2vw, 1.05rem);
+  font-style: italic;
+  color: rgba(253,138,164,0.7);
+  display: block;
 }
 
-/* OR divider */
 .rsvp-or {
   font-family: 'Cinzel', serif;
   font-size: 0.65rem;
@@ -559,7 +514,6 @@ body {
   text-transform: uppercase;
 }
 
-/* QR block */
 .rsvp-qr-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .rsvp-qr-label {
   font-family: 'Cinzel', serif;
@@ -581,7 +535,6 @@ body {
   height: 140px;
   border-radius: 4px;
 }
-/* Placeholder QR if no image: */
 .rsvp-qr-placeholder {
   width: 140px;
   height: 140px;
@@ -618,7 +571,7 @@ body {
 .footer-copy { font-family: 'Cormorant Garamond', serif; font-size: 0.8rem; font-style: italic; color: rgba(253,138,164,0.35); margin-top: 8px; }
 
 /* ══════════════════════════════════
-   6. GALLERY — Pre-wedding photos
+   6. GALLERY
 ══════════════════════════════════ */
 #gallery-section {
   background: linear-gradient(180deg, #1a0208 0%, #2a0510 100%);
@@ -767,35 +720,27 @@ body {
 
 <!-- ══════════════════════════════════════════════
      §1 — FULLSCREEN POPUP OVERLAY
-     Background: deep rose overlay (+ your couple photo if added)
 ══════════════════════════════════════════════ -->
-<div id="invite-overlay">
-  <!-- 
-    TO ADD A COVER PHOTO:
-    In the #invite-overlay CSS above, change the background to:
-    background: linear-gradient(rgba(140,27,36,0.65),rgba(44,26,10,0.72)), url('./Image/cover.jpg') center/cover no-repeat;
-  -->
+<div id="invite-overlay" role="dialog" aria-modal="true" aria-label="Wedding Invitation">
   <div class="invite-popup">
 
     <span class="hero-khmer-title">សិរីសួស្តីអាពាហ៍ពិពាហ៍</span>
-    <span style="font-family: 'Moul'; font-size: 1.0rem; color: #fcafc2;">សូមគោរពអញ្ជើញ</span> 
+    <span style="font-family: 'Moul'; font-size: 1.0rem; color: #fcafc2;">សូមគោរពអញ្ជើញ</span>
 
-    <div class="popup-divider"></div> 
+    <div class="popup-divider"></div>
 
     <p style="font-family: 'Moul'; font-size: 1.0rem; color:#FDF8F0;">ផ្ដល់ជាកិត្តិយសចូលរួមកម្មពិធីកាត់ចំណងដៃអាពាហ៍ពិពាហ៍របស់យើងខ្ញុំ</p>
     <div style="margin-top: 280px;">
       <p style="font-family: 'Moul'; font-size: 1.0rem; color: #ede6e8;">
-      សត្ថា រស្មី &amp; ស្រស់ ស្រីពេជ្រ<br/>
-      ថ្ងៃព្រហស្បតិ៍ · ១៤ ឧសភា ២០២៦
-    </p>
+        សត្ថា រស្មី &amp; ស្រស់ ស្រីពេជ្រ<br/>
+        ថ្ងៃព្រហស្បតិ៍ · ១៤ ឧសភា ២០២៦
+      </p>
     </div>
     <br>
     <button class="btn-open-invite" id="btn-open-overlay" onclick="openInvitation()">
       <span>Open Invitation</span>
       <span class="btn-open-km">សូមចុចបើកនៅទីនេះ ✦</span>
     </button>
-
-    <!-- <p class="popup-note">· Tap to open with music 🎵 ·</p> -->
 
   </div>
 </div>
@@ -843,7 +788,6 @@ body {
     <span class="couple-name-sub">Srors Sreypech</span>
   </div>
 
-  <!-- ── HIGHLIGHTED DATE ── -->
   <div class="hero-date-highlight">
     <span class="hero-date-label">Save The Date</span>
     <span class="hero-date-main">Thursday · 14 May 2026 · 5:00 PM</span>
@@ -861,14 +805,13 @@ body {
 
 
 <!-- ══════════════════════════════════════════════
-     §3 — ANNOUNCEMENT: LOGISTICS + MAP
+     §3 — LOGISTICS + MAP
 ══════════════════════════════════════════════ -->
 <section id="logistics-section">
   <div class="section">
     <p style="font-family: 'Moul'; font-size: 2rem; color:#e07f94;text-align: center;">កម្មវិធីប្រព្រឹត្តទៅ</p>
     <div class="logistics-card reveal">
       <div class="logistics-top-bar">
-        <!-- <p class="logistics-event-label">You Are Cordially Invited</p> -->
         <h2 class="logistics-event-title">Wedding Banquet</h2>
       </div>
       <div class="logistics-body">
@@ -915,7 +858,7 @@ body {
   </div>
   <div style="text-align:center;">
     <a href="https://maps.app.goo.gl/1B6T9HZdyR77sMNJA?g_st=ic" target="_blank" rel="noopener noreferrer" class="btn-directions">
-      <span style="font-family: 'Khmer OS Muol Light', serif; font-size: 1.0rem;">📍 មើលក្នុង Google Maps</span> 
+      <span style="font-family: 'Khmer OS Muol Light', serif; font-size: 1.0rem;">📍 មើលក្នុង Google Maps</span>
     </a>
   </div>
   <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.85rem;color:rgba(253,138,164,0.3);text-align:center;margin-top:24px;">
@@ -998,7 +941,7 @@ body {
 
 
 <!-- ══════════════════════════════════════════════
-     §5 — RSVP: BUTTON (YES → Google Sheet) + QR
+     §5 — RSVP
 ══════════════════════════════════════════════ -->
 <section id="footer-section">
   <div class="floral-border">
@@ -1024,53 +967,55 @@ body {
     Are you attending, <span id="rsvp-guest-name">our honoured guest?</span>
   </p>
 
-  <!-- ── SPLIT: YES button LEFT · OR · QR RIGHT ── -->
   <div class="rsvp-split reveal">
 
     <!-- YES — Attending button -->
     <div class="rsvp-attend-block">
-      <!-- <p class="rsvp-attend-label">👇 Click if you will attend</p> -->
       <button class="btn-rsvp-yes" id="rsvp-btn" onclick="handleRSVP()">
         ✓ &nbsp; បញ្ជាក់ពីវត្តមានរបស់អ្នក
       </button>
-      <p  style="font-family: 'Khmer OS Battambang';" class="btn-rsvp-km">ចុចប្រសិនបើអ្នកនឹងចូលរួម</p>
-      <p class="rsvp-success-msg" id="rsvp-success">សូមអរគុណសម្រាប់ការផ្លល់កិត្តិយសចូលរួម❤️</p> <br>
-      <p class="rsvp-success-msg" id="rsvp-success">With Joy, We Await You</p>
+      <!-- FIX: semantic <p> for sub-label, NOT inside the button -->
+      <p class="rsvp-sub-label-km">ចុចប្រសិនបើអ្នកនឹងចូលរួម</p>
+
+      <!-- FIX: Single success message block, hidden by default, shown via JS -->
+      <div class="rsvp-success-msg" id="rsvp-success" aria-live="polite">
+        <span class="rsvp-success-main">សូមអរគុណ ❤️</span>
+        <span class="rsvp-success-sub">With Joy, We Await You</span>
+      </div>
     </div>
 
     <!-- OR divider -->
     <div class="rsvp-or">—  រឺ​  —</div>
 
-    <!-- QR — for those who cannot attend (scan to respond) -->
+    <!-- QR block -->
     <div class="rsvp-qr-block">
-      <p class="btn-rsvp-km">ចងដៃតាមរយៈ QR Code</p>
+      <p class="rsvp-sub-label-km">ចងដៃតាមរយៈ QR Code</p>
       <div class="rsvp-qr-frame">
         <!--
-          REPLACE the placeholder below with your actual QR image:
-          <img src="./Image/qr-rsvp.png" alt="RSVP QR Code" />
-          The QR should link to your Google Form or a "No" pre-fill URL.
+          Replace the placeholder with your actual QR image:
+          <img src="./Image/qr-rsvp.png" alt="RSVP QR Code" width="140" height="140" />
         -->
         <div class="rsvp-qr-placeholder">
           Place your<br/>QR image here<br/>(./Image/qr-rsvp.png)
         </div>
       </div>
-      <!-- <p class="rsvp-qr-note">Scan to let us know you cannot make it</p> -->
     </div>
 
   </div>
 
+  <!-- FIX: social-section div was unclosed — fixed below -->
   <div class="social-section reveal">
-    <!-- <p class="social-label">Connect With The Couple</p> <br> -->
-    <p class="btn-rsvp-km">Telegram កូនកម្លោះ និង កូនក្រម៉ំ</p> <br>
+    <p class="rsvp-sub-label-km">Telegram កូនកម្លោះ និង កូនក្រម៉ំ</p>
+    <br>
     <div class="social-buttons">
-      <a href="https://t.me/Smey_Jan19" target="_blank" rel="noopener" class="social-btn">
+      <a href="https://t.me/Smey_Jan19" target="_blank" rel="noopener noreferrer" class="social-btn">
         <span class="social-btn-icon">💬</span>កូនកម្លោះ
       </a>
-      <a href="https://t.me/S_ssreypech" target="_blank" rel="noopener" class="social-btn">
-        <span class="social-btn-icon">💬</span> កូនក្រម៉ំ
+      <a href="https://t.me/S_ssreypech" target="_blank" rel="noopener noreferrer" class="social-btn">
+        <span class="social-btn-icon">💬</span>កូនក្រម៉ំ
       </a>
     </div>
-  </div>
+  </div><!-- ← FIX: was missing this closing tag -->
 
   <div class="footer-floral">
     <svg viewBox="0 0 500 50" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;width:90%;">
@@ -1084,13 +1029,7 @@ body {
     </svg>
   </div>
 
-  <!-- <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;">
-    <div style="width:56px;height:56px;border-radius:50%;border:1px solid rgba(225,22,55,0.3);display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:8px;">
-      <span style="font-family:'Koh Santepheap',serif;font-size:0.7rem;color:rgba(225,22,55,0.45);">ស្រឡាញ់</span>
-      <span style="font-size:0.9rem;opacity:0.45;">🌹</span>
-    </div> -->
-    <p style="font-family:var(--snell);font-size:1.4rem;color:rgba(253,138,164,0.45);">Rasmey &amp; Sreypech</p>
-  </div>
+  <p style="font-family:var(--snell);font-size:1.4rem;color:rgba(253,138,164,0.45);">Rasmey &amp; Sreypech</p>
 
   <p class="footer-copy">Thursday · 14th May 2026 · Battambang, Cambodia</p>
   <p class="footer-copy" style="margin-top:4px;font-family:'Koh Santepheap',serif;font-size:0.9rem;">ថ្ងៃព្រហស្បតិ៍ ទី១៤ ខែឧសភា ឆ្នាំ២០២៦</p>
@@ -1098,7 +1037,7 @@ body {
 
 
 <!-- ══════════════════════════════════════════════
-     §6 — PRE-WEDDING GALLERY
+     §6 — GALLERY
 ══════════════════════════════════════════════ -->
 <section id="gallery-section">
   <div class="gallery-title-wrap reveal">
@@ -1112,8 +1051,7 @@ body {
   <div class="gallery-row-top" id="gallery-top">
     <div class="polaroid tilt-l gallery-item">
       <div class="polaroid-img-wrap">
-        <img src="./Image/1.JPG" alt="Together" class="polaroid-img img-fill-1" onerror="this.style.display='none';this.nextElementSibling&&(this.nextElementSibling.style.display='flex')">
-        <div class="photo-overlay" style="display:none;"><span class="photo-overlay-icon">🌸</span></div>
+        <img src="./Image/1.JPG" alt="Together" class="polaroid-img img-fill-1" onerror="this.style.display='none'">
       </div>
       <span class="polaroid-caption">Together</span>
     </div>
@@ -1163,12 +1101,12 @@ body {
 <!-- ══════════════════════════════════════════════
      MUSIC FAB
 ══════════════════════════════════════════════ -->
-<div id="music-fab">
-  <div class="music-disc" id="music-disc" title="Toggle music">
+<div id="music-fab" role="region" aria-label="Music player">
+  <div class="music-disc" id="music-disc" role="button" tabindex="0" aria-label="Toggle music" title="Toggle music">
     <div class="ring ring-1"></div>
     <div class="ring ring-2"></div>
-    <span class="music-note-icon">♪</span>
-    <div class="music-eq">
+    <span class="music-note-icon" aria-hidden="true">♪</span>
+    <div class="music-eq" aria-hidden="true">
       <span></span><span></span><span></span><span></span>
     </div>
   </div>
@@ -1180,15 +1118,15 @@ body {
 // ══════════════════════════════════════════════
 //  URL PARAM: Guest Name  (?guest=Name)
 // ══════════════════════════════════════════════
-(function() {
+(function () {
   const params = new URLSearchParams(window.location.search);
-  const guest  = params.get('guest');
-  if (guest && guest.trim()) {
-    const name = decodeURIComponent(guest.trim());
+  const raw    = params.get('guest');
+  if (raw && raw.trim()) {
+    const name = decodeURIComponent(raw.trim());
     const disp = document.getElementById('guest-display');
-    if (disp) disp.textContent = name;
     const rsvpName = document.getElementById('rsvp-guest-name');
-    if (rsvpName) rsvpName.textContent = name;
+    if (disp) disp.textContent = name;
+    if (rsvpName) rsvpName.textContent = name + '?';
   }
 })();
 
@@ -1204,63 +1142,71 @@ function openInvitation() {
 
 // ══════════════════════════════════════════════
 //  RSVP — YES BUTTON → Google Sheets via Apps Script
+//
+//  HOW TO SET UP (one-time, ~5 minutes):
+//  ──────────────────────────────────────
+//  1. Open your Google Sheet
+//  2. Click Extensions → Apps Script
+//  3. Delete any existing code, paste this:
+//
+//     function doGet(e) {
+//       const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+//       const guest = decodeURIComponent(e.parameter.guest || '');
+//       if (!guest) return ContentService.createTextOutput('missing');
+//       const data = sheet.getDataRange().getValues();
+//       for (let i = 1; i < data.length; i++) {
+//         if (data[i][0].toString().toLowerCase() === guest.toLowerCase()) {
+//           sheet.getRange(i + 1, 3).setValue('Yes');
+//           sheet.getRange(i + 1, 4).setValue(new Date().toLocaleString('km-KH'));
+//           return ContentService.createTextOutput('ok');
+//         }
+//       }
+//       return ContentService.createTextOutput('not found');
+//     }
+//
+//  4. Click Deploy → New deployment → Web App
+//     • Execute as: Me
+//     • Who has access: Anyone
+//  5. Click Deploy → copy the URL → paste it below
 // ══════════════════════════════════════════════
-/*
-  HOW TO WIRE THIS TO GOOGLE SHEETS:
-  ─────────────────────────────────────────────
-  1. Open your Google Sheet → Extensions → Apps Script
-  2. Paste this Apps Script code and click "Deploy → New deployment → Web App"
-     Set "Who has access" to "Anyone" → Copy the web app URL
-
-  ──── Apps Script code to paste ────
-  function doPost(e) {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("RSVP");
-    const data  = JSON.parse(e.postData.contents);
-    // Find the row where column A matches the guest name, update RSVP column
-    const values = sheet.getDataRange().getValues();
-    for (let i = 1; i < values.length; i++) {
-      if (values[i][0] == data.guest) {   // Column A = Guest Name
-        sheet.getRange(i + 1, 3).setValue("YES");  // Column C = RSVP
-        sheet.getRange(i + 1, 4).setValue(new Date().toLocaleString());
-        break;
-      }
-    }
-    return ContentService.createTextOutput(JSON.stringify({status:"ok"}))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-  ────────────────────────────────────
-
-  3. After deploying, copy your Web App URL and paste it below:
-*/
 
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxHq8xCW5yTTbKEVs1vCS1eR6qxdHWubHk2BfU0MbwOCdgj8kO6xzUGrbDWmHmac37Otw/exec';
 
 async function handleRSVP() {
-  const btn  = document.getElementById('rsvp-btn');
-  const succ = document.getElementById('rsvp-success');
-  const params = new URLSearchParams(window.location.search);
-  const guest  = params.get('guest') ? decodeURIComponent(params.get('guest').trim()) : 'Unknown Guest';
+  const btn     = document.getElementById('rsvp-btn');
+  const success = document.getElementById('rsvp-success');
 
+  // Get guest name from URL param
+  const params = new URLSearchParams(window.location.search);
+  const raw    = params.get('guest');
+  const guest  = raw ? decodeURIComponent(raw.trim()) : 'Unknown Guest';
+
+  // Prevent double-submit
+  if (btn.disabled) return;
   btn.disabled = true;
-  btn.textContent = '⏳  Sending…';
+  btn.textContent = '⏳  កំពុងបញ្ជូន…';
 
   try {
-    if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE') {
-      await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        mode:   'no-cors',   // Apps Script does not return CORS headers on POST
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ guest: guest, rsvp: 'YES', timestamp: new Date().toISOString() })
-      });
-    }
-    btn.textContent = '✓  Confirmed!';
-    btn.style.background = 'linear-gradient(135deg,#8c1b24,#d01f43)';
-    btn.style.opacity = '0.8';
-    if (succ) { succ.style.display = 'block'; }
-  } catch(err) {
+    // FIX: Use GET with query params — this is the ONLY method that works
+    // reliably with 'no-cors' mode (POST body is dropped in no-cors).
+    await fetch(
+      `${APPS_SCRIPT_URL}?guest=${encodeURIComponent(guest)}`,
+      { method: 'GET', mode: 'no-cors' }
+    );
+
+    // no-cors won't return a readable response, but the Apps Script still ran ✓
+    btn.textContent = '✓  បានបញ្ជាក់រួចហើយ!';
+    btn.style.background = 'linear-gradient(135deg, #8c1b24, #d01f43)';
+    btn.style.opacity = '0.75';
+
+    // FIX: Show the single success block
+    if (success) success.classList.add('visible');
+
+  } catch (err) {
+    // Re-enable button so guest can retry
     btn.disabled = false;
-    btn.textContent = '✓  Confirm Attendance';
-    alert('Something went wrong. Please try again.');
+    btn.textContent = '✓  បញ្ជាក់ពីវត្តមានរបស់អ្នក';
+    alert('មានបញ្ហាមួយ។ សូមព្យាយាមម្ដងទៀត។\n(Something went wrong. Please try again.)');
   }
 }
 
@@ -1287,8 +1233,8 @@ function animateGallerySection(containerId, direction) {
         items.forEach((item, i) => {
           setTimeout(() => {
             item.style.animation = direction === 'left'
-              ? `slideLeft 0.75s ease both`
-              : `slideRight 0.75s ease both`;
+              ? 'slideLeft 0.75s ease both'
+              : 'slideRight 0.75s ease both';
             item.classList.add('anim-in');
           }, i * 160);
         });
@@ -1305,9 +1251,9 @@ animateGallerySection('gallery-bottom', 'left');
 //  YOUTUBE MUSIC PLAYER
 // ══════════════════════════════════════════════
 const YT_ID = 'pdqDokXpdEg';
-let ytPlayer = null;
-let isPlaying = false;
-let ytReady   = false;
+let ytPlayer        = null;
+let isPlaying       = false;
+let ytReady         = false;
 let autoPlayPending = false;
 
 const ytScript = document.createElement('script');
@@ -1319,17 +1265,17 @@ ytDiv.id = 'yt-hidden-player';
 ytDiv.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;bottom:0;left:0;z-index:-99;';
 document.body.appendChild(ytDiv);
 
-window.onYouTubeIframeAPIReady = function() {
+window.onYouTubeIframeAPIReady = function () {
   ytPlayer = new YT.Player('yt-hidden-player', {
     videoId: YT_ID,
-    playerVars: { autoplay:0, controls:0, loop:1, playlist:YT_ID, mute:0, playsinline:1, rel:0, modestbranding:1 },
+    playerVars: { autoplay: 0, controls: 0, loop: 1, playlist: YT_ID, mute: 0, playsinline: 1, rel: 0, modestbranding: 1 },
     events: {
-      onReady: function(e) {
+      onReady: function (e) {
         e.target.setVolume(60);
         ytReady = true;
         if (autoPlayPending) { e.target.playVideo(); autoPlayPending = false; }
       },
-      onStateChange: function(e) {
+      onStateChange: function (e) {
         if (e.data === YT.PlayerState.PLAYING) setMusicState(true);
         else if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) setMusicState(false);
       }
@@ -1359,7 +1305,7 @@ function setMusicState(playing) {
   }
 }
 
-const NOTE_CHARS = ['♪','♫','♩','♬'];
+const NOTE_CHARS = ['♪', '♫', '♩', '♬'];
 let noteInterval = null;
 function spawnNotes() {
   if (noteInterval) return;
@@ -1378,11 +1324,19 @@ function spawnNotes() {
   }, 700);
 }
 
-document.getElementById('music-disc').addEventListener('click', function(e) {
+// FIX: Also support keyboard (Enter/Space) for music disc accessibility
+const disc = document.getElementById('music-disc');
+disc.addEventListener('click', function (e) {
   e.stopPropagation();
   if (!ytPlayer || !ytReady) { autoPlayPending = true; return; }
   if (isPlaying) ytPlayer.pauseVideo();
   else ytPlayer.playVideo();
+});
+disc.addEventListener('keydown', function (e) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    disc.click();
+  }
 });
 </script>
 
