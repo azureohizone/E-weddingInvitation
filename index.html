@@ -996,7 +996,9 @@ body {
           <img src="./Image/qr-rsvp.png" alt="RSVP QR Code" width="140" height="140" />
         -->
         <div class="rsvp-qr-placeholder">
-          Place your<br/>QR image here<br/>(./Image/qr-rsvp.png)
+          <br/>
+          <img src="./Image/qr.jpg" alt="RSVP QR Code" width="340" height="340">
+          <br/>
         </div>
       </div>
     </div>
@@ -1149,20 +1151,20 @@ function openInvitation() {
 //  2. Click Extensions → Apps Script
 //  3. Delete any existing code, paste this:
 //
-//     function doGet(e) {
-//       const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-//       const guest = decodeURIComponent(e.parameter.guest || '');
-//       if (!guest) return ContentService.createTextOutput('missing');
-//       const data = sheet.getDataRange().getValues();
-//       for (let i = 1; i < data.length; i++) {
-//         if (data[i][0].toString().toLowerCase() === guest.toLowerCase()) {
-//           sheet.getRange(i + 1, 3).setValue('Yes');
-//           sheet.getRange(i + 1, 4).setValue(new Date().toLocaleString('km-KH'));
-//           return ContentService.createTextOutput('ok');
-//         }
-//       }
-//       return ContentService.createTextOutput('not found');
-//     }
+    // function doGet(e) {
+    //   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    //   const guest = decodeURIComponent(e.parameter.guest || '');
+    //   if (!guest) return ContentService.createTextOutput('missing');
+    //   const data = sheet.getDataRange().getValues();
+    //   for (let i = 1; i < data.length; i++) {
+    //     if (data[i][0].toString().toLowerCase() === guest.toLowerCase()) {
+    //       sheet.getRange(i + 1, 3).setValue('Yes');
+    //       sheet.getRange(i + 1, 4).setValue(new Date().toLocaleString('km-KH'));
+    //       return ContentService.createTextOutput('ok');
+    //     }
+    //   }
+    //   return ContentService.createTextOutput('not found');
+    // }
 //
 //  4. Click Deploy → New deployment → Web App
 //     • Execute as: Me
@@ -1170,7 +1172,7 @@ function openInvitation() {
 //  5. Click Deploy → copy the URL → paste it below
 // ══════════════════════════════════════════════
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxHq8xCW5yTTbKEVs1vCS1eR6qxdHWubHk2BfU0MbwOCdgj8kO6xzUGrbDWmHmac37Otw/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz25rGr_tj20fLTLveBOh5PvbhBCyROgu8WggK8cvMAgxiRsC0MqdzK_fym78_RiBCYYQ/exec';
 
 async function handleRSVP() {
   const btn     = document.getElementById('rsvp-btn');
