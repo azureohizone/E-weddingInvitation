@@ -1152,7 +1152,7 @@ body {
    CONFIG — paste your Apps Script URL here
    (GET endpoint, deployed with "Anyone" access)
 ══════════════════════════════════════════════ */
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxHq8xCW5yTTbKEVs1vCS1eR6qxdHWubHk2BfU0MbwOCdgj8kO6xzUGrbDWmHmac37Otw/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz25rGr_tj20fLTLveBOh5PvbhBCyROgu8WggK8cvMAgxiRsC0MqdzK_fym78_RiBCYYQ/exec';
 
 /* ══════════════════════════════════════════════
    GUEST NAME — read once from URL param (?guest=)
@@ -1191,15 +1191,15 @@ function openInvitation() {
      the button so the guest can retry.
 ══════════════════════════════════════════════ */
 async function handleRSVP() {
-  const btn      = document.getElementById('rsvp-btn');
-  const btnText  = document.getElementById('rsvp-btn-text');
+  const btn = document.getElementById('rsvp-btn');
+  const btnText = document.getElementById('rsvp-btn-text');
   const successEl = document.getElementById('rsvp-success');
   const successText = document.getElementById('rsvp-success-text');
-  const errorEl   = document.getElementById('rsvp-error');
+  const errorEl = document.getElementById('rsvp-error');
 
-  if (btn.disabled) return; // already submitted
+  if (btn.disabled) return;
 
-  const name = guestName || 'ភ្ញៀវកិត្តិយស';
+  const name = guestName || 'Unknown Guest';
 
   // Loading state
   btn.disabled = true;
@@ -1208,25 +1208,35 @@ async function handleRSVP() {
   errorEl.classList.remove('show');
 
   try {
+    // Use no-cors but handle the "opaque" response
     const url = `${APPS_SCRIPT_URL}?guest=${encodeURIComponent(name)}&rsvp=YES&ts=${encodeURIComponent(new Date().toISOString())}`;
-    await fetch(url, { method: 'GET', mode: 'no-cors' });
+    
+    // Try with cors mode first
+    const response = await fetch(url, { 
+      method: 'GET',
+      mode: 'cors', // Try cors first
+      headers: {
+        'Accept': 'text/plain'
+      }
+    }).catch(() => {
+      // Fallback to no-cors if cors fails
+      return fetch(url, { method: 'GET', mode: 'no-cors' });
+    });
 
-    // Success - update message with guest name
+    // Since we can't read the response with no-cors, assume success if no error thrown
     btn.classList.remove('loading');
     btn.classList.add('confirmed');
     btnText.textContent = '✓ ជោគជ័យ!';
     
-    // Update success message with guest name
     if (successText) {
       successText.textContent = `សូមអរគុណសម្រាប់ការផ្ដល់កិត្តិយសចូលរួម ${name} ❤️`;
     }
     successEl.classList.add('show');
 
   } catch (err) {
-    // Network failure — let guest retry
     btn.disabled = false;
     btn.classList.remove('loading');
-    btnText.textContent = '✓ \u00A0 បញ្ជាក់ពីវត្តមានរបស់អ្នក';
+    btnText.textContent = '✓ បញ្ជាក់ពីវត្តមានរបស់អ្នក';
     errorEl.classList.add('show');
     console.error('RSVP fetch error:', err);
   }
