@@ -1146,30 +1146,74 @@ body {
   <span class="music-fab-label" id="music-fab-label" aria-live="polite">Tap to Play</span>
 </div>
 
-
 <script>
 /* ══════════════════════════════════════════════
-   CONFIG — paste your Apps Script URL here
-   (GET endpoint, deployed with "Anyone" access)
+   CONFIG — Google Form Details
 ══════════════════════════════════════════════ */
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxf0pDwqKuZ3-CpTM4CiF6_Kmg2Oelx1PF1q6zQ6d-VnFkM6YCeWSKwdx69UX68TVBFFw/exec';
+const FORM_ID = '1FAIpQLScQkA_hWFrNJ-7E5xlxo5UVz8MA0LBvLoDA_JZ1rT_ZR5-buw';
+const FORM_URL = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse`;
+const ENTRY_NAME = 'entry.877086558';   // Your Name field ID
+const ENTRY_RSVP = 'entry.1498135098'; // Your RSVP field ID
 
 /* ══════════════════════════════════════════════
-   GUEST NAME — read once from URL param (?guest=)
+   GUEST NAME — read from URL param (?guest=)
 ══════════════════════════════════════════════ */
 let guestName = '';
 (function () {
   const raw = new URLSearchParams(window.location.search).get('guest');
-  guestName = raw ? decodeURIComponent(raw.trim()) : 'ភ្ញៀវកិត្តិយសជាទីស្រឡាញ់'; // Default to "Honored Guest" if no name
+  guestName = raw ? decodeURIComponent(raw.trim()) : 'ភ្ញៀវកិត្តិយសជាទីស្រឡាញ់';
 })();
 
-// Update display elements with guest name
-document.addEventListener('DOMContentLoaded', function() {
-  const el1 = document.getElementById('guest-display');
-  const el2 = document.getElementById('rsvp-guest-name');
-  if (el1) el1.textContent = guestName;
-  if (el2) el2.textContent = guestName;
-});
+/* ══════════════════════════════════════════════
+   RSVP STATE MANAGEMENT — Prevent Duplicates
+══════════════════════════════════════════════ */
+const RSVP_STORAGE_KEY = `rsvp_done_${FORM_ID}`;
+
+function checkRSVPStatus() {
+  // Check if already submitted (using localStorage)
+  if (localStorage.getItem(RSVP_STORAGE_KEY)) {
+    showAlreadySubmittedState();
+    return true;
+  }
+  return false;
+}
+
+function showAlreadySubmittedState() {
+  const btn = document.getElementById('rsvp-btn');
+  const successMsg = document.getElementById('rsvp-success');
+  const btnText = document.getElementById('rsvp-btn-text');
+  
+  if (btn) {
+    btn.disabled = true;
+    btn.classList.add('confirmed');
+    if (btnText) {
+      btnText.innerHTML = '✓ បានបញ្ជាក់រួចរាល់';
+    } else {
+      btn.innerHTML = '<span>✓ បានបញ្ជាក់រួចរាល់</span>';
+    }
+  }
+  
+  // Show success message
+  if (successMsg) {
+    successMsg.classList.add('show');
+    const successText = document.getElementById('rsvp-success-text');
+    if (successText) {
+      successText.textContent = 'សូមអរគុណ! អ្នកបានបញ្ជាក់វត្តមានរួចរាល់ហើយ ❤️';
+    }
+  }
+  
+  // Update confirm text
+  const confirmText = document.getElementById('rsvp-confirm-text');
+  if (confirmText) {
+    confirmText.innerHTML = `សូមអរគុណ <span>${guestName}</span> សម្រាប់ការបញ្ជាក់វត្តមាន!`;
+  }
+}
+
+function markAsSubmitted() {
+  localStorage.setItem(RSVP_STORAGE_KEY, 'true');
+  localStorage.setItem(`${RSVP_STORAGE_KEY}_time`, new Date().toISOString());
+  localStorage.setItem(`${RSVP_STORAGE_KEY}_name`, guestName);
+}
 
 /* ══════════════════════════════════════════════
    OVERLAY
@@ -1182,58 +1226,54 @@ function openInvitation() {
 }
 
 /* ══════════════════════════════════════════════
-   RSVP
-   Strategy: GET + no-cors
-   — Works from GitHub Pages → Apps Script.
-   — With no-cors we cannot read the response,
-     but the request fires and Apps Script writes.
-   — On network failure the catch block restores
-     the button so the guest can retry.
+   RSVP — Submit to Google Form
 ══════════════════════════════════════════════ */
-async function handleRSVP() {
-  const btn = document.getElementById('rsvp-btn');
-  const btnText = document.getElementById('rsvp-btn-text');
-  const successEl = document.getElementById('rsvp-success');
-  const successText = document.getElementById('rsvp-success-text');
-  const errorEl = document.getElementById('rsvp-error');
-
-  if (btn.disabled) return;
-
-  const name = guestName || 'Unknown Guest';
-
-  btn.disabled = true;
-  btn.classList.add('loading');
-  btnText.textContent = 'Processing...';
-  errorEl.classList.remove('show');
-
-  try {
-    const url = `${APPS_SCRIPT_URL}?guest=${encodeURIComponent(name)}&rsvp=YES&ts=${encodeURIComponent(new Date().toISOString())}`;
-
-    const response = await fetch(url); // ✅ NO no-cors
-    const result = await response.json();
-
-    if (result.status === "ok") {
-      btn.classList.remove('loading');
-      btn.classList.add('confirmed');
-      btnText.textContent = '✓ Confirmed';
-
-      successText.textContent = `សូមអរគុណសម្រាប់ការផ្ដល់កិត្តិយសចូលរួម ${name} ❤️`;
-      successEl.classList.add('show');
-    } else {
-      throw new Error(result.message || "Failed");
-    }
-
-  } catch (err) {
-    btn.disabled = false;
-    btn.classList.remove('loading');
-    btnText.textContent = 'Try Again';
-    errorEl.classList.add('show');
-    console.error(err);
+function handleRSVP() {
+  // PREVENT DUPLICATE: Check first before doing anything
+  if (localStorage.getItem(RSVP_STORAGE_KEY)) {
+    showAlreadySubmittedState();
+    return;
   }
+
+  const btn = document.getElementById('rsvp-btn');
+  const spinner = document.getElementById('rsvp-spinner');
+  const btnText = document.getElementById('rsvp-btn-text');
+  const errorMsg = document.getElementById('rsvp-error');
+
+  // Show loading state
+  if (btn) btn.disabled = true;
+  if (spinner) spinner.style.display = 'inline-block';
+  if (btnText) btnText.textContent = 'កំពុងផ្ញើ...';
+  if (errorMsg) errorMsg.classList.remove('show');
+
+  // Prepare form data
+  const formData = new FormData();
+  formData.append(ENTRY_NAME, guestName);
+  formData.append(ENTRY_RSVP, 'Yes');
+
+  // Submit to Google Form using no-cors mode
+  fetch(FORM_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: formData
+  })
+  .then(() => {
+    // Success (no-cors doesn't return readable response, but request fires)
+    markAsSubmitted();
+    showAlreadySubmittedState();
+  })
+  .catch((error) => {
+    console.error('RSVP Error:', error);
+    // Show error, allow retry
+    if (errorMsg) errorMsg.classList.add('show');
+    if (btn) btn.disabled = false;
+    if (spinner) spinner.style.display = 'none';
+    if (btnText) btnText.innerHTML = '✓ បញ្ជាក់ពីវត្តមានរបស់អ្នក';
+  });
 }
 
 /* ══════════════════════════════════════════════
-   SCROLL REVEAL — unobserve after first trigger
+   SCROLL REVEAL
 ══════════════════════════════════════════════ */
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
@@ -1243,8 +1283,6 @@ const revealObserver = new IntersectionObserver((entries) => {
     }
   });
 }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-
-document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
 /* ══════════════════════════════════════════════
    GALLERY ANIMATIONS
@@ -1269,27 +1307,22 @@ function animateGallerySection(containerId, direction) {
   observer.observe(container);
 }
 
-animateGallerySection('gallery-top',    'right');
-animateGallerySection('gallery-bottom', 'left');
-
 /* ══════════════════════════════════════════════
    YOUTUBE MUSIC
 ══════════════════════════════════════════════ */
-const YT_VIDEO_ID    = 'PmOqnjhLLTk';
-let ytPlayer         = null;
-let isPlaying        = false;
-let ytReady          = false;
-let autoPlayPending  = false;
+const YT_VIDEO_ID = 'PmOqnjhLLTk';
+let ytPlayer = null;
+let isPlaying = false;
+let ytReady = false;
+let autoPlayPending = false;
 
-// Inject IFrame API script
 const ytScript = document.createElement('script');
-ytScript.src   = 'https://www.youtube.com/iframe_api';
+ytScript.src = 'https://www.youtube.com/iframe_api';
 ytScript.async = true;
 document.head.appendChild(ytScript);
 
-// Hidden player mount point
 const ytMount = document.createElement('div');
-ytMount.id    = 'yt-hidden-player';
+ytMount.id = 'yt-hidden-player';
 ytMount.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;bottom:0;left:0;z-index:-99;';
 document.body.appendChild(ytMount);
 
@@ -1310,7 +1343,7 @@ window.onYouTubeIframeAPIReady = function () {
       },
       onStateChange(e) {
         const S = YT.PlayerState;
-        if      (e.data === S.PLAYING)                     setMusicState(true);
+        if (e.data === S.PLAYING) setMusicState(true);
         else if (e.data === S.PAUSED || e.data === S.ENDED) setMusicState(false);
       }
     }
@@ -1324,7 +1357,7 @@ function tryAutoPlay() {
 
 function setMusicState(playing) {
   isPlaying = playing;
-  const disc  = document.getElementById('music-disc');
+  const disc = document.getElementById('music-disc');
   const label = document.getElementById('music-fab-label');
 
   disc.querySelectorAll('.ring').forEach(r => r.classList.toggle('paused', !playing));
@@ -1335,7 +1368,6 @@ function setMusicState(playing) {
   if (playing) spawnNotes();
 }
 
-// Floating music notes
 const NOTE_CHARS = ['♪', '♫', '♩', '♬'];
 let noteInterval = null;
 
@@ -1344,30 +1376,58 @@ function spawnNotes() {
   noteInterval = setInterval(() => {
     if (!isPlaying) { clearInterval(noteInterval); noteInterval = null; return; }
     const note = document.createElement('span');
-    note.className   = 'floating-note';
+    note.className = 'floating-note';
     note.textContent = NOTE_CHARS[Math.floor(Math.random() * NOTE_CHARS.length)];
     note.style.setProperty('--dx', ((Math.random() - 0.5) * 40) + 'px');
-    note.style.left             = (Math.random() * 30 + 5) + 'px';
-    note.style.bottom           = '58px';
+    note.style.left = (Math.random() * 30 + 5) + 'px';
+    note.style.bottom = '58px';
     note.style.animationDuration = (1.2 + Math.random() * 0.8) + 's';
     document.getElementById('music-disc').appendChild(note);
     setTimeout(() => note.remove(), 2200);
   }, 700);
 }
 
-// Disc — click + keyboard
 function toggleMusic() {
   if (!ytPlayer || !ytReady) { autoPlayPending = true; return; }
   if (isPlaying) ytPlayer.pauseVideo();
-  else           ytPlayer.playVideo();
+  else ytPlayer.playVideo();
 }
 
-const musicDisc = document.getElementById('music-disc');
-musicDisc.addEventListener('click', toggleMusic);
-musicDisc.addEventListener('keydown', e => {
-  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMusic(); }
+/* ══════════════════════════════════════════════
+   DOM READY — Initialize Everything
+══════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', function() {
+  // Update guest name displays
+  const guestDisplay = document.getElementById('guest-display');
+  const rsvpGuestName = document.getElementById('rsvp-guest-name');
+  if (guestDisplay) guestDisplay.textContent = guestName;
+  if (rsvpGuestName) rsvpGuestName.textContent = guestName;
+  
+  // Update confirm text with guest name
+  const confirmText = document.getElementById('rsvp-confirm-text');
+  if (confirmText) {
+    confirmText.innerHTML = `តើលោកអ្នកនឹងបានមកចូលរួមដែរឬទេ? <span>${guestName}</span>`;
+  }
+
+  // Check if already RSVPed (on page load)
+  checkRSVPStatus();
+
+  // Setup scroll reveal
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+  
+  // Setup gallery animations
+  animateGallerySection('gallery-top', 'right');
+  animateGallerySection('gallery-bottom', 'left');
+  
+  // Setup music player
+  const musicDisc = document.getElementById('music-disc');
+  if (musicDisc) {
+    musicDisc.addEventListener('click', toggleMusic);
+    musicDisc.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMusic(); }
+    });
+  }
 });
 </script>
-
 </body>
 </html>
