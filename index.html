@@ -395,10 +395,10 @@ body {
   background: linear-gradient(135deg, var(--rose-dark), var(--rose-primary), var(--rose-soft), var(--rose-primary), var(--rose-dark));
   background-size: 200% auto;
   color: #FFFFFF;
-  font-family: 'Moul', serif;
+  font-family: 'Moul','Koh Santepheap', serif;
   font-size: clamp(0.7rem, 1.8vw, 0.85rem);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-transform: none;
   text-decoration: none;
   padding: 16px 36px;
   border: none;
@@ -407,6 +407,8 @@ body {
   transition: background-position 0.5s, box-shadow 0.3s, transform 0.2s;
   font-weight: 600;
   animation: pulse-rose 3s infinite;
+  line-height: 1.8;
+  white-space: nowrap;
 }
 .btn-directions:hover { background-position: right center; box-shadow: 0 8px 32px rgba(225,22,55,0.6); transform: translateY(-2px); }
 
@@ -482,11 +484,11 @@ body {
   gap: 10px;
   background: linear-gradient(135deg, var(--rose-dark) 0%, var(--rose-primary) 50%, var(--rose-deep) 100%);
   color: #FFFFFF;
-  font-family: 'Koh Santepheap', serif;
+  font-family: 'Moul','Koh Santepheap', serif;
   font-size: clamp(0.7rem, 1.8vw, 0.85rem);
   font-weight: 600;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-transform: none;
   border: 1.5px solid rgba(253,138,164,0.3);
   border-radius: 100px;
   padding: 18px 44px;
@@ -496,6 +498,8 @@ body {
   position: relative;
   overflow: hidden;
   min-width: 220px;
+  line-height: 1.6;
+  white-space: nowrap;
 }
 .btn-rsvp-yes::before {
   content: '';
