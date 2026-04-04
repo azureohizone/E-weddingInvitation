@@ -395,7 +395,7 @@ body {
   background: linear-gradient(135deg, var(--rose-dark), var(--rose-primary), var(--rose-soft), var(--rose-primary), var(--rose-dark));
   background-size: 200% auto;
   color: #FFFFFF;
-  font-family: 'Cinzel', serif;
+  font-family: 'Moul', serif;
   font-size: clamp(0.7rem, 1.8vw, 0.85rem);
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -608,7 +608,7 @@ body {
 .social-buttons { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
 .social-btn { display: inline-flex; align-items: center; gap: 10px; padding: 12px 24px; border: 1px solid rgba(225,22,55,0.3); color: var(--rose-light); text-decoration: none; font-family: 'Cormorant Garamond', serif; font-size: clamp(0.85rem, 2vw, 1rem); transition: all 0.3s ease; background: rgba(225,22,55,0.05); }
 .social-btn:hover { border-color: var(--rose-primary); background: rgba(225,22,55,0.12); transform: translateY(-2px); }
-.social-btn-icon { font-size: 1.3rem; }
+.social-btn-icon { font-size: 1.3rem; font-family: 'Koh Santepheap', serif; }
 .footer-floral { margin: 40px auto 24px; opacity: 0.4; }
 .footer-copy { font-family: 'Cormorant Garamond', serif; font-size: 0.8rem; font-style: italic; color: rgba(253,138,164,0.35); margin-top: 8px; }
 .footer-couple-sig { font-family: var(--snell); font-size: 1.4rem; color: rgba(253,138,164,0.45); }
@@ -800,7 +800,6 @@ body {
 
   <div class="guest-banner">
     <p style="font-family:'Moul';font-size:2rem;color:#fcafc2;">សូមស្វាគមន៍ និង សូមគោរពយ៉ាងជ្រាលជ្រៅដល់ភ្ញៀវកិត្តិយស</p>
-    <!-- <h1 class="guest-name" id="guest-display">Dear Honoured Guest</h1> -->
   </div>
 
   <h2 class="hero-khmer-title">សិរីសួស្តីអាពាហ៍ពិពាហ៍</h2>
@@ -891,7 +890,7 @@ body {
   </div>
   <div style="text-align:center;">
     <a href="https://maps.app.goo.gl/1B6T9HZdyR77sMNJA?g_st=ic" target="_blank" rel="noopener noreferrer" class="btn-directions">
-      <span style="font-size:1rem; font-family: 'Koh Santepheap', serif;">📍 មើលក្នុង Google Maps</span>
+      <span>📍 មើលក្នុង Google Maps</span> 
     </a>
   </div>
   <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.85rem;color:rgba(253,138,164,0.3);text-align:center;margin-top:24px;">
@@ -1011,10 +1010,9 @@ body {
       <p class="btn-rsvp-km">សូមចុចប្រសិនបើអ្នកនឹងចូលរួម</p>
 
       <!-- Shown after confirmed -->
-      <div class="rsvp-success-msg" id="rsvp-success">
-        <p class="rsvp-success-km">សូមអរគុណសម្រាប់ការផ្លល់កិត្តិយសចូលរួម ❤️</p>
-        <p class="guest-name"></p>
-      </div>
+  <div class="rsvp-success-msg" id="rsvp-success">
+  <p class="rsvp-success-km" id="rsvp-success-text">សូមអរគុណសម្រាប់ការផ្ដល់កិត្តិយសចូលរួម ❤️</p>
+  </div>
 
       <!-- Shown on network error -->
       <p class="rsvp-error-msg" id="rsvp-error">
@@ -1156,17 +1154,19 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxHq8xCW5yTTbKE
 /* ══════════════════════════════════════════════
    GUEST NAME — read once from URL param (?guest=)
 ══════════════════════════════════════════════ */
-const guestName = (function () {
+let guestName = '';
+(function () {
   const raw = new URLSearchParams(window.location.search).get('guest');
-  return raw ? decodeURIComponent(raw.trim()) : '';
+  guestName = raw ? decodeURIComponent(raw.trim()) : 'ភ្ញៀវកិត្តិយសជាទីស្រឡាញ់'; // Default to "Honored Guest" if no name
 })();
 
-if (guestName) {
+// Update display elements with guest name
+document.addEventListener('DOMContentLoaded', function() {
   const el1 = document.getElementById('guest-display');
   const el2 = document.getElementById('rsvp-guest-name');
   if (el1) el1.textContent = guestName;
   if (el2) el2.textContent = guestName;
-}
+});
 
 /* ══════════════════════════════════════════════
    OVERLAY
@@ -1191,15 +1191,16 @@ async function handleRSVP() {
   const btn      = document.getElementById('rsvp-btn');
   const btnText  = document.getElementById('rsvp-btn-text');
   const successEl = document.getElementById('rsvp-success');
+  const successText = document.getElementById('rsvp-success-text');
   const errorEl   = document.getElementById('rsvp-error');
 
   if (btn.disabled) return; // already submitted
 
-  const name = guestName || 'Unknown Guest';
+  const name = guestName || 'ភ្ញៀវកិត្តិយស';
 
   // Loading state
   btn.disabled = true;
-  btn.classList.add('កំពុងផ្ញើរ…');
+  btn.classList.add('loading');
   btnText.textContent = 'កំពុងដំណើរការ…';
   errorEl.classList.remove('show');
 
@@ -1207,16 +1208,21 @@ async function handleRSVP() {
     const url = `${APPS_SCRIPT_URL}?guest=${encodeURIComponent(name)}&rsvp=YES&ts=${encodeURIComponent(new Date().toISOString())}`;
     await fetch(url, { method: 'GET', mode: 'no-cors' });
 
-    // Success
-    btn.classList.remove('កំពុងផ្ញើរ');
+    // Success - update message with guest name
+    btn.classList.remove('loading');
     btn.classList.add('confirmed');
-    btnText.textContent = '✓  ជោគជ័យ!';
+    btnText.textContent = '✓ ជោគជ័យ!';
+    
+    // Update success message with guest name
+    if (successText) {
+      successText.textContent = `សូមអរគុណសម្រាប់ការផ្ដល់កិត្តិយសចូលរួម ${name} ❤️`;
+    }
     successEl.classList.add('show');
 
   } catch (err) {
     // Network failure — let guest retry
     btn.disabled = false;
-    btn.classList.remove('កំពុងផ្ញើរ');
+    btn.classList.remove('loading');
     btnText.textContent = '✓ \u00A0 បញ្ជាក់ពីវត្តមានរបស់អ្នក';
     errorEl.classList.add('show');
     console.error('RSVP fetch error:', err);
@@ -1290,7 +1296,7 @@ window.onYouTubeIframeAPIReady = function () {
     playerVars: {
       autoplay: 0, controls: 0, loop: 1,
       playlist: YT_VIDEO_ID, mute: 0,
-      start: 10,
+      start: 9,
       playsinline: 1, rel: 0, modestbranding: 1
     },
     events: {
