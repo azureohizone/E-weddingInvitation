@@ -1165,8 +1165,9 @@ let guestName = '';
 
 /* ══════════════════════════════════════════════
    RSVP STATE MANAGEMENT — Prevent Duplicates
+   KEY includes guest name so each guest is independent
 ══════════════════════════════════════════════ */
-const RSVP_STORAGE_KEY = `rsvp_done_${FORM_ID}`;
+const RSVP_STORAGE_KEY = `rsvp_done_${FORM_ID}_${encodeURIComponent(guestName)}`;
 
 function checkRSVPStatus() {
   if (localStorage.getItem(RSVP_STORAGE_KEY)) {
@@ -1181,7 +1182,7 @@ function showAlreadySubmittedState() {
   const successMsg = document.getElementById('rsvp-success');
   const btnText = document.getElementById('rsvp-btn-text');
   const spinner = document.getElementById('rsvp-spinner');
-  
+
   if (btn) {
     btn.disabled = true;
     btn.classList.add('confirmed');
@@ -1190,7 +1191,7 @@ function showAlreadySubmittedState() {
   if (btnText) {
     btnText.innerHTML = '✓ បានបញ្ជាក់រួចរាល់';
   }
-  
+
   if (successMsg) {
     successMsg.classList.add('show');
     const successText = document.getElementById('rsvp-success-text');
@@ -1198,7 +1199,7 @@ function showAlreadySubmittedState() {
       successText.textContent = 'សូមអរគុណ! អ្នកបានបញ្ជាក់វត្តមានរួចរាល់ហើយ ❤️';
     }
   }
-  
+
   const confirmText = document.getElementById('rsvp-confirm-text');
   if (confirmText) {
     confirmText.innerHTML = `សូមអរគុណ <span>${guestName}</span> សម្រាប់ការបញ្ជាក់វត្តមាន!`;
@@ -1245,7 +1246,7 @@ function handleRSVP() {
   // Create a hidden iframe for form submission
   const iframeId = 'hidden-form-iframe';
   let iframe = document.getElementById(iframeId);
-  
+
   if (!iframe) {
     iframe = document.createElement('iframe');
     iframe.id = iframeId;
@@ -1258,41 +1259,42 @@ function handleRSVP() {
   const form = document.createElement('form');
   form.method = 'POST';
   form.action = FORM_URL;
-  form.target = iframeId; // Submit to iframe
-  
+  form.target = iframeId;
+
   // Add name field
   const nameInput = document.createElement('input');
   nameInput.type = 'hidden';
   nameInput.name = ENTRY_NAME;
   nameInput.value = guestName;
   form.appendChild(nameInput);
-  
+
   // Add RSVP field
   const rsvpInput = document.createElement('input');
   rsvpInput.type = 'hidden';
   rsvpInput.name = ENTRY_RSVP;
   rsvpInput.value = 'Yes';
   form.appendChild(rsvpInput);
-  
-  // Add form to body and submit
+
+  // Add form to body
   document.body.appendChild(form);
-  
-  // Handle iframe load (success indicator)
-  iframe.onload = function() {
-    // Form submitted successfully
+
+  // FIX: Use a flag so iframe onload only acts AFTER the form was actually submitted,
+  // not on the initial blank load that browsers fire when the iframe is first created.
+  let formSubmitted = false;
+
+  iframe.onload = function () {
+    if (!formSubmitted) return; // ignore the initial blank iframe load
     markAsSubmitted();
     showAlreadySubmittedState();
-    
-    // Cleanup
-    setTimeout(() => {
-      form.remove();
-    }, 1000);
+    setTimeout(() => { form.remove(); }, 1000);
   };
-  
-  // Submit the form
+
+  // Set flag THEN submit — order matters
+  formSubmitted = true;
   form.submit();
-  
-  // Fallback: If iframe doesn't trigger load event within 3 seconds, assume success
+
+  // Fallback: if iframe onload never fires (some browsers block cross-origin),
+  // assume success after 3 seconds
   setTimeout(() => {
     if (!localStorage.getItem(RSVP_STORAGE_KEY)) {
       markAsSubmitted();
@@ -1425,13 +1427,13 @@ function toggleMusic() {
 /* ══════════════════════════════════════════════
    DOM READY — Initialize Everything
 ══════════════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   // Update guest name displays
   const guestDisplay = document.getElementById('guest-display');
   const rsvpGuestName = document.getElementById('rsvp-guest-name');
   if (guestDisplay) guestDisplay.textContent = guestName;
   if (rsvpGuestName) rsvpGuestName.textContent = guestName;
-  
+
   // Update confirm text with guest name
   const confirmText = document.getElementById('rsvp-confirm-text');
   if (confirmText) {
@@ -1443,11 +1445,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Setup scroll reveal
   document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-  
+
   // Setup gallery animations
   animateGallerySection('gallery-top', 'right');
   animateGallerySection('gallery-bottom', 'left');
-  
+
   // Setup music player
   const musicDisc = document.getElementById('music-disc');
   if (musicDisc) {
