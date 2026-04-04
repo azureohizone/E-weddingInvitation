@@ -1145,9 +1145,8 @@ body {
   </div>
   <span class="music-fab-label" id="music-fab-label" aria-live="polite">Tap to Play</span>
 </div>
-
 <script>
-/* ══════════════════════════════════════════════
+  /* ══════════════════════════════════════════════
    CONFIG — Google Form Details
 ══════════════════════════════════════════════ */
 const FORM_ID = '1FAIpQLScQkA_hWFrNJ-7E5xlxo5UVz8MA0LBvLoDA_JZ1rT_ZR5-buw';
@@ -1170,7 +1169,6 @@ let guestName = '';
 const RSVP_STORAGE_KEY = `rsvp_done_${FORM_ID}`;
 
 function checkRSVPStatus() {
-  // Check if already submitted (using localStorage)
   if (localStorage.getItem(RSVP_STORAGE_KEY)) {
     showAlreadySubmittedState();
     return true;
@@ -1182,18 +1180,17 @@ function showAlreadySubmittedState() {
   const btn = document.getElementById('rsvp-btn');
   const successMsg = document.getElementById('rsvp-success');
   const btnText = document.getElementById('rsvp-btn-text');
+  const spinner = document.getElementById('rsvp-spinner');
   
   if (btn) {
     btn.disabled = true;
     btn.classList.add('confirmed');
-    if (btnText) {
-      btnText.innerHTML = '✓ បានបញ្ជាក់រួចរាល់';
-    } else {
-      btn.innerHTML = '<span>✓ បានបញ្ជាក់រួចរាល់</span>';
-    }
+  }
+  if (spinner) spinner.style.display = 'none';
+  if (btnText) {
+    btnText.innerHTML = '✓ បានបញ្ជាក់រួចរាល់';
   }
   
-  // Show success message
   if (successMsg) {
     successMsg.classList.add('show');
     const successText = document.getElementById('rsvp-success-text');
@@ -1202,7 +1199,6 @@ function showAlreadySubmittedState() {
     }
   }
   
-  // Update confirm text
   const confirmText = document.getElementById('rsvp-confirm-text');
   if (confirmText) {
     confirmText.innerHTML = `សូមអរគុណ <span>${guestName}</span> សម្រាប់ការបញ្ជាក់វត្តមាន!`;
@@ -1226,10 +1222,10 @@ function openInvitation() {
 }
 
 /* ══════════════════════════════════════════════
-   RSVP — Submit to Google Form
+   RSVP — Submit to Google Form via Hidden Iframe
 ══════════════════════════════════════════════ */
 function handleRSVP() {
-  // PREVENT DUPLICATE: Check first before doing anything
+  // PREVENT DUPLICATE: Check first
   if (localStorage.getItem(RSVP_STORAGE_KEY)) {
     showAlreadySubmittedState();
     return;
@@ -1246,30 +1242,63 @@ function handleRSVP() {
   if (btnText) btnText.textContent = 'កំពុងផ្ញើ...';
   if (errorMsg) errorMsg.classList.remove('show');
 
-  // Prepare form data
-  const formData = new FormData();
-  formData.append(ENTRY_NAME, guestName);
-  formData.append(ENTRY_RSVP, 'Yes');
+  // Create a hidden iframe for form submission
+  const iframeId = 'hidden-form-iframe';
+  let iframe = document.getElementById(iframeId);
+  
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.id = iframeId;
+    iframe.name = iframeId;
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+  }
 
-  // Submit to Google Form using no-cors mode
-  fetch(FORM_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    body: formData
-  })
-  .then(() => {
-    // Success (no-cors doesn't return readable response, but request fires)
+  // Create a form to submit to the iframe
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = FORM_URL;
+  form.target = iframeId; // Submit to iframe
+  
+  // Add name field
+  const nameInput = document.createElement('input');
+  nameInput.type = 'hidden';
+  nameInput.name = ENTRY_NAME;
+  nameInput.value = guestName;
+  form.appendChild(nameInput);
+  
+  // Add RSVP field
+  const rsvpInput = document.createElement('input');
+  rsvpInput.type = 'hidden';
+  rsvpInput.name = ENTRY_RSVP;
+  rsvpInput.value = 'Yes';
+  form.appendChild(rsvpInput);
+  
+  // Add form to body and submit
+  document.body.appendChild(form);
+  
+  // Handle iframe load (success indicator)
+  iframe.onload = function() {
+    // Form submitted successfully
     markAsSubmitted();
     showAlreadySubmittedState();
-  })
-  .catch((error) => {
-    console.error('RSVP Error:', error);
-    // Show error, allow retry
-    if (errorMsg) errorMsg.classList.add('show');
-    if (btn) btn.disabled = false;
-    if (spinner) spinner.style.display = 'none';
-    if (btnText) btnText.innerHTML = '✓ បញ្ជាក់ពីវត្តមានរបស់អ្នក';
-  });
+    
+    // Cleanup
+    setTimeout(() => {
+      form.remove();
+    }, 1000);
+  };
+  
+  // Submit the form
+  form.submit();
+  
+  // Fallback: If iframe doesn't trigger load event within 3 seconds, assume success
+  setTimeout(() => {
+    if (!localStorage.getItem(RSVP_STORAGE_KEY)) {
+      markAsSubmitted();
+      showAlreadySubmittedState();
+    }
+  }, 3000);
 }
 
 /* ══════════════════════════════════════════════
@@ -1429,5 +1458,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
+
 </body>
 </html>
