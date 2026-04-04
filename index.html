@@ -1146,13 +1146,11 @@ body {
   <span class="music-fab-label" id="music-fab-label" aria-live="polite">Tap to Play</span>
 </div>
 <script>
-  /* ══════════════════════════════════════════════
-   CONFIG — Google Form Details
+
+/* ══════════════════════════════════════════════
+   CONFIG — Apps Script Web App URL
 ══════════════════════════════════════════════ */
-const FORM_ID = '1FAIpQLScQkA_hWFrNJ-7E5xlxo5UVz8MA0LBvLoDA_JZ1rT_ZR5-buw';
-const FORM_URL = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse`;
-const ENTRY_NAME = 'entry.877086558';   // Your Name field ID
-const ENTRY_RSVP = 'entry.1498135098'; // Your RSVP field ID
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxzvYJWXE0G0gHM97DWIn9FLR4RoLajfgs5W9y-jxXH3KLV-JCTtJubNMc0RTpCuVaTwg/exec'
 
 /* ══════════════════════════════════════════════
    GUEST NAME — read from URL param (?guest=)
@@ -1167,7 +1165,7 @@ let guestName = '';
    RSVP STATE MANAGEMENT — Prevent Duplicates
    KEY includes guest name so each guest is independent
 ══════════════════════════════════════════════ */
-const RSVP_STORAGE_KEY = `rsvp_done_${FORM_ID}_${encodeURIComponent(guestName)}`;
+const RSVP_STORAGE_KEY = `rsvp_done_satha_rasmey_${encodeURIComponent(guestName)}`;
 
 function checkRSVPStatus() {
   if (localStorage.getItem(RSVP_STORAGE_KEY)) {
@@ -1223,10 +1221,10 @@ function openInvitation() {
 }
 
 /* ══════════════════════════════════════════════
-   RSVP — Submit to Google Form via Hidden Iframe
+   RSVP — Submit to Google Sheet via Apps Script
 ══════════════════════════════════════════════ */
 function handleRSVP() {
-  // PREVENT DUPLICATE: Check first
+  // PREVENT DUPLICATE
   if (localStorage.getItem(RSVP_STORAGE_KEY)) {
     showAlreadySubmittedState();
     return;
@@ -1237,70 +1235,33 @@ function handleRSVP() {
   const btnText = document.getElementById('rsvp-btn-text');
   const errorMsg = document.getElementById('rsvp-error');
 
-  // Show loading state
   if (btn) btn.disabled = true;
   if (spinner) spinner.style.display = 'inline-block';
   if (btnText) btnText.textContent = 'កំពុងផ្ញើ...';
   if (errorMsg) errorMsg.classList.remove('show');
 
-  // Create a hidden iframe for form submission
-  const iframeId = 'hidden-form-iframe';
-  let iframe = document.getElementById(iframeId);
+  const params = new URLSearchParams();
+  params.append('name', guestName);
+  params.append('rsvp', 'Yes');
 
-  if (!iframe) {
-    iframe = document.createElement('iframe');
-    iframe.id = iframeId;
-    iframe.name = iframeId;
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
-  }
-
-  // Create a form to submit to the iframe
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = FORM_URL;
-  form.target = iframeId;
-
-  // Add name field
-  const nameInput = document.createElement('input');
-  nameInput.type = 'hidden';
-  nameInput.name = ENTRY_NAME;
-  nameInput.value = guestName;
-  form.appendChild(nameInput);
-
-  // Add RSVP field
-  const rsvpInput = document.createElement('input');
-  rsvpInput.type = 'hidden';
-  rsvpInput.name = ENTRY_RSVP;
-  rsvpInput.value = 'Yes';
-  form.appendChild(rsvpInput);
-
-  // Add form to body
-  document.body.appendChild(form);
-
-  // FIX: Use a flag so iframe onload only acts AFTER the form was actually submitted,
-  // not on the initial blank load that browsers fire when the iframe is first created.
-  let formSubmitted = false;
-
-  iframe.onload = function () {
-    if (!formSubmitted) return; // ignore the initial blank iframe load
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors', // Apps Script requires this
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params.toString()
+  })
+  .then(() => {
+    // no-cors means we can't read the response, but if fetch didn't throw it went through
     markAsSubmitted();
     showAlreadySubmittedState();
-    setTimeout(() => { form.remove(); }, 1000);
-  };
-
-  // Set flag THEN submit — order matters
-  formSubmitted = true;
-  form.submit();
-
-  // Fallback: if iframe onload never fires (some browsers block cross-origin),
-  // assume success after 3 seconds
-  setTimeout(() => {
-    if (!localStorage.getItem(RSVP_STORAGE_KEY)) {
-      markAsSubmitted();
-      showAlreadySubmittedState();
-    }
-  }, 3000);
+  })
+  .catch(() => {
+    // Network failure
+    if (btn) btn.disabled = false;
+    if (spinner) spinner.style.display = 'none';
+    if (btnText) btnText.textContent = 'បញ្ជាក់វត្តមាន';
+    if (errorMsg) errorMsg.classList.add('show');
+  });
 }
 
 /* ══════════════════════════════════════════════
