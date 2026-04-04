@@ -1211,18 +1211,15 @@ async function handleRSVP() {
     // Use no-cors but handle the "opaque" response
     const url = `${APPS_SCRIPT_URL}?guest=${encodeURIComponent(name)}&rsvp=YES&ts=${encodeURIComponent(new Date().toISOString())}`;
     
+    const response = await fetch(url, { method: 'GET' });
+    const result   = await response.json();
     // Try with cors mode first
-    const response = await fetch(url, { 
-      method: 'GET',
-      mode: 'cors', // Try cors first
-      headers: {
-        'Accept': 'text/plain'
-      }
-    }).catch(() => {
-      // Fallback to no-cors if cors fails
-      return fetch(url, { method: 'GET', mode: 'no-cors' });
-    });
-
+    if (result.status === 'ok' || result.status === 'appended') {
+  // show success
+    } else {
+  throw new Error(result.message || 'Unknown error');
+    }
+    
     // Since we can't read the response with no-cors, assume success if no error thrown
     btn.classList.remove('loading');
     btn.classList.add('confirmed');
